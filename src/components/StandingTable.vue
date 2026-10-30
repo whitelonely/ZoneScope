@@ -6,7 +6,7 @@
       stripe
       :header-cell-style="headerStyle"
       :cell-style="cellStyle"
-      empty-text="暂无榜单数据"
+      empty-text="暂无比赛数据"
     >
       <el-table-column label="#" width="64" align="center">
         <template #default="{ row }">
