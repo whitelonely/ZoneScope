@@ -34,7 +34,7 @@
 
       <el-table-column label="吃鸡数" width="96" align="center">
         <template #default="{ row }">
-          <span v-if="row.wwcd" class="wwcd"><svg class="wwcd-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="18.3" width="20" height="2.9" rx="1.3" fill="#d9c3a0" /><ellipse cx="11" cy="13.4" rx="8" ry="5.4" fill="#d97706" /><ellipse cx="12.6" cy="11.2" rx="2.1" ry="1.7" fill="#b45309" /><path d="M12.9 11.2 16.7 6.5" stroke="#b45309" stroke-width="1.9" stroke-linecap="round" /><circle cx="17.4" cy="5.6" r="1.3" fill="#fcd34d" /><circle cx="18.8" cy="4.7" r="1.3" fill="#fcd34d" /><path d="M10.5 10.1c0.9 1.5 1.5 2.3 2.1 2.9" stroke="#7c2d12" stroke-width="0.9" fill="none" stroke-linecap="round" /></svg><span class="wwcd-num">{{ row.wwcd }}</span></span>
+          <span v-if="row.wwcd" class="wwcd"><svg class="wwcd-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="18.2" width="20" height="2.9" rx="1.3" fill="#d9c3a0" /><path d="M4.6 16.4 C4.4 11.6 7.8 8.8 11.4 8.8 C14.2 8.8 16.2 10 17.2 11.9 L20.6 9.6 C21.2 12.2 20.2 15.4 17.4 17.1 C13.4 19.5 6.4 19.2 4.6 16.4 Z" fill="#d97706" /><ellipse cx="12.6" cy="11.2" rx="2.1" ry="1.7" fill="#b45309" /><path d="M12.9 11.2 16.7 6.5" stroke="#b45309" stroke-width="1.9" stroke-linecap="round" /><circle cx="17.4" cy="5.6" r="1.3" fill="#cbd5e1" /><circle cx="18.8" cy="4.7" r="1.3" fill="#cbd5e1" /><path d="M10.5 10.1c0.9 1.5 1.5 2.3 2.1 2.9" stroke="#7c2d12" stroke-width="0.9" fill="none" stroke-linecap="round" /></svg><span class="wwcd-num">{{ row.wwcd }}</span></span>
           <span v-else class="muted">—</span>
         </template>
       </el-table-column>
