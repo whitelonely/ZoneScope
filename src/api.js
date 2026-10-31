@@ -229,39 +229,56 @@ export function cnLocation(location) {
   return `${countryCn} ▪ ${cityCn}`
 }
 
-const STAGE_CN = {
-  'GROUP STAGE': '小组赛',
-  'WINNERS STAGE': '胜者组',
-  'SURVIVAL STAGE': '突围组',
-  'FINAL STAGE': '总决赛',
-  'GRAND FINALS': '总决赛',
-  FINALS: '决赛',
-  'A STAGE': 'A 组阶段',
-  'B STAGE': 'B 组阶段',
-  'S STAGE': 'S 组阶段',
-}
+const STAGE_RULES = [
+  [/OVERALL|SUMMARY|TOTAL/i, '总览'],
+  [/SEMI[\s-]*FINALS?/i, '半决赛'],
+  [/QUARTER[\s-]*FINALS?/i, '四分之一决赛'],
+  [/GRAND[\s-]*FINALS?/i, '总决赛'],
+  [/FINAL/i, '总决赛'],
+  [/PLAY[\s-]*IN/i, '入围赛'],
+  [/QUALIFIER|QUALIFY/i, '预选赛'],
+  [/LOWER[\s-]*BRACKET|LOSERS?/i, '败者组'],
+  [/WINNERS?/i, '胜者组'],
+  [/SURVIVAL/i, '突围组'],
+  [/SWISS/i, '瑞士轮'],
+  [/KNOCK[\s-]*OUT/i, '淘汰赛'],
+  [/RELEGATION/i, '保级赛'],
+  [/GROUP/i, '小组赛'],
+  [/REGULAR/i, '常规赛'],
+  [/A[\s-]*STAGE/i, 'A 组阶段'],
+  [/B[\s-]*STAGE/i, 'B 组阶段'],
+  [/S[\s-]*STAGE/i, 'S 组阶段'],
+]
 
 export function cnStage(name) {
   if (!name) return ''
   let s = String(name).toUpperCase().trim()
+
   let day = ''
-  const m = /\s*DAY\s*(\d+)$/.exec(s)
-  if (m) {
-    day = `第${m[1]}天`
-    s = s.slice(0, m.index).trim()
+  const dayMatch = /\s*DAY\s*(\d+)$/.exec(s)
+  if (dayMatch) {
+    day = `第${dayMatch[1]}天`
+    s = s.slice(0, dayMatch.index).trim()
   }
-  let base = STAGE_CN[s]
-  if (!base) {
-    // 处理 "GROUP STAGE A/B" 这种「阶段 + 分组」的组合
-    for (const key of Object.keys(STAGE_CN)) {
-      if (s.startsWith(key + ' ')) {
-        base = `${STAGE_CN[key]} ${s.slice(key.length + 1)}`
-        break
-      }
+
+  if (/^[A-Z](?:\/[A-Z])+$/.test(s)) {
+    const label = s.replace(/\//g, '、') + ' 组'
+    return day ? `${label} ${day}` : label
+  }
+
+  let base = s
+  for (const [pattern, label] of STAGE_RULES) {
+    if (pattern.test(s)) {
+      base = label
+      break
     }
   }
-  if (!base) base = s
-  base = base.replace(/([A-Z])\/([A-Z])/g, '$1、$2 组')
+
+  const groups = s.match(/\b[A-Z]\/[A-Z]\b/g)
+  if (groups && base !== s) {
+    base += ' ' + groups.map((g) => g.replace('/', '、')).join('、') + ' 组'
+  }
+
   if (!base) return day
   return day ? `${base} ${day}` : base
 }
