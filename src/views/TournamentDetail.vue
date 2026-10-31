@@ -48,13 +48,18 @@
           :name="String(group.id)"
         >
           <div class="stage-inner">
-            <el-segmented
-              v-if="group.stages.length > 1"
-              v-model="activeStage"
-              :options="stageOptions(group)"
-              class="stage-switch"
-              @change="onStageChange"
-            />
+            <div v-if="group.stages.length > 1" class="stage-switch">
+              <button
+                v-for="s in group.stages"
+                :key="s.id"
+                type="button"
+                class="stage-chip"
+                :class="{ active: String(s.id) === activeStage }"
+                @click="selectStage(s.id)"
+              >
+                {{ cnStage(s.name) }}
+              </button>
+            </div>
 
             <div v-loading="stageLoading">
               <template v-if="stageData">
@@ -137,10 +142,6 @@ const stageData = ref(null)
 const openMatches = ref([])
 const stageCache = ref(null)
 
-function stageOptions(group) {
-  return group.stages.map((s) => ({ label: cnStage(s.name), value: String(s.id) }))
-}
-
 async function selectStage(stageId) {
   const group = groups.value.find((g) => String(g.id) === activeGroup.value)
   const stage = group && group.stages.find((s) => String(s.id) === String(stageId))
@@ -169,10 +170,6 @@ async function selectStage(stageId) {
   } finally {
     stageLoading.value = false
   }
-}
-
-function onStageChange(value) {
-  selectStage(value)
 }
 
 function onGroupChange(name) {
@@ -302,7 +299,53 @@ watch(() => props.tournamentId, load)
 }
 
 .stage-switch {
-  margin-bottom: 18px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 8px;
+  margin-bottom: 12px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stage-switch::-webkit-scrollbar {
+  height: 6px;
+}
+
+.stage-switch::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.stage-switch::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.stage-chip {
+  flex: 0 0 auto;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--zs-border);
+  background: var(--zs-card);
+  color: #374151;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.stage-chip:hover {
+  border-color: var(--zs-primary);
+  color: var(--zs-primary);
+}
+
+.stage-chip.active {
+  background: var(--zs-primary);
+  border-color: var(--zs-primary);
+  color: #fff;
+  font-weight: 600;
 }
 
 .table-wrap {
