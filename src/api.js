@@ -130,12 +130,15 @@ export function shortName(name) {
 const REGION_CN = {
   GLOBAL: '全球性赛事',
   CN: '中国区赛事',
-  ASIA: '亚洲赛事',
-  KR: '韩国赛事',
-  JP: '日本赛事',
-  SEA: '东南亚赛事',
-  NA: '北美赛事',
-  EU: '欧洲赛事',
+  ASIA: '亚洲赛区',
+  APAC: '亚太赛区',
+  KR: '韩国赛区',
+  JP: '日本赛区',
+  SEA: '东南亚赛区',
+  NA: '北美赛区',
+  EU: '欧洲赛区',
+  EMEA: '欧洲中东非洲赛区',
+  AMERICAS: '美洲赛区',
 }
 
 export function cnRegion(region) {
