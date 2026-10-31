@@ -18,11 +18,12 @@
         <template #default="{ row }">
           <div class="team">
             <img
-              v-if="row.team_image_url"
+              v-if="row.team_image_url && !broken[row.team_name]"
               class="team-logo"
               :src="row.team_image_url"
               :alt="row.team_name"
               loading="lazy"
+              @error="broken[row.team_name] = true"
             />
             <div v-else class="team-logo team-logo--empty">
               {{ (row.team_name || '?').slice(0, 1) }}
@@ -53,6 +54,8 @@
 </template>
 
 <script setup>
+import { reactive } from 'vue'
+
 defineProps({
   rows: { type: Array, default: () => [] },
 })
@@ -72,6 +75,9 @@ const cellStyle = {
 // 每一行的 mask id 必须唯一：同一个 id 出现多次时，
 // DOM 更新会导致后续引用失效、图标变成空白方块。
 const uid = Math.random().toString(36).slice(2, 8)
+
+// 队标加载失败（外链 404）时记下来，改显示队名首字母，避免留下空白
+const broken = reactive({})
 
 function maskIdFor(row) {
   const team = String(row.team_name || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 6)
