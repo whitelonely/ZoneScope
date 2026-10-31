@@ -324,8 +324,8 @@ watch(() => props.tournamentId, load)
 
 .stage-chip {
   flex: 0 0 auto;
-  padding: 7px 14px;
-  border-radius: 999px;
+  padding: 7px 12px;
+  border-radius: 2px;
   border: 1px solid var(--zs-border);
   background: var(--zs-card);
   color: #374151;
@@ -360,20 +360,49 @@ watch(() => props.tournamentId, load)
 .match-title {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 6px 10px;
   padding: 4px 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .match-name {
   font-weight: 600;
   font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .match-stat {
   margin-left: auto;
-  margin-right: 10px;
+  margin-right: 6px;
   font-size: 12.5px;
   color: var(--zs-sub);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .match-title {
+    gap: 6px 8px;
+    padding: 2px 0;
+  }
+  .match-name {
+    flex: 1 1 100%;
+    font-size: 13.5px;
+  }
+  .match-stat {
+    margin-left: auto;
+    margin-right: 4px;
+  }
+  :deep(.el-collapse-item__header) {
+    padding: 0 2px;
+    height: auto;
+    min-height: 48px;
+    align-items: center;
+  }
 }
 
 :deep(.el-tabs__header) {
