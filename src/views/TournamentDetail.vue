@@ -87,7 +87,7 @@
                           </span>
                         </div>
                       </template>
-                      <div class="table-wrap">
+                      <div v-if="openMatches.includes(String(match.id))" class="table-wrap">
                         <StandingTable :rows="match.standings" />
                       </div>
                     </el-collapse-item>

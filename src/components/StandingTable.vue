@@ -76,6 +76,7 @@ const cellStyle = {
 // DOM 更新会导致后续引用失效、图标变成空白方块。
 const uid = Math.random().toString(36).slice(2, 8)
 
+
 // 队标加载失败（外链 404）时记下来，改显示队名首字母，避免留下空白
 const broken = reactive({})
 
@@ -148,8 +149,10 @@ function rankClass(rank) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  color: var(--zs-sub);
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
 }
 
 .team-name {
