@@ -55,7 +55,11 @@ export const api = {
     }
     if (params.q) {
       const q = String(params.q).toLowerCase()
-      rows = rows.filter((r) => String(r.name || '').toLowerCase().includes(q))
+      rows = rows.filter(
+        (r) =>
+          String(r.name || '').toLowerCase().includes(q) ||
+          shortName(r.name).toLowerCase().includes(q),
+      )
     }
     return { count: rows.length, results: rows }
   },
@@ -165,6 +169,18 @@ const COUNTRY_CN = {
   VIETNAM: '越南',
   SWEDEN: '瑞典',
   MALAYSIA: '马来西亚',
+  'SAUDI ARABIA': '沙特阿拉伯',
+  'UNITED KINGDOM': '英国',
+  SPAIN: '西班牙',
+  ITALY: '意大利',
+  POLAND: '波兰',
+  BRAZIL: '巴西',
+  CANADA: '加拿大',
+  AUSTRALIA: '澳大利亚',
+  INDONESIA: '印度尼西亚',
+  PHILIPPINES: '菲律宾',
+  SINGAPORE: '新加坡',
+  ONLINE: '线上',
 }
 
 const CITY_CN = {
@@ -175,6 +191,25 @@ const CITY_CN = {
   PARIS: '巴黎',
   ISTANBUL: '伊斯坦布尔',
   BERLIN: '柏林',
+  BANGKOK: '曼谷',
+  RIYADH: '利雅得',
+  DUBAI: '迪拜',
+  TOKYO: '东京',
+  OSAKA: '大阪',
+  LONDON: '伦敦',
+  MADRID: '马德里',
+  MILAN: '米兰',
+  WARSAW: '华沙',
+  'SÃO PAULO': '圣保罗',
+  TORONTO: '多伦多',
+  SYDNEY: '悉尼',
+  JAKARTA: '雅加达',
+  MANILA: '马尼拉',
+  SINGAPORE: '新加坡',
+  'KUALA LUMPUR': '吉隆坡',
+  HANOI: '河内',
+  'HO CHI MINH CITY': '胡志明市',
+  STOCKHOLM: '斯德哥尔摩',
 }
 
 export function cnLocation(location) {
@@ -184,7 +219,8 @@ export function cnLocation(location) {
     .map((s) => s.trim())
     .filter(Boolean)
   if (parts.length === 1) {
-    return COUNTRY_CN[parts[0].toUpperCase()] || parts[0]
+    const only = parts[0].toUpperCase()
+    return COUNTRY_CN[only] || CITY_CN[only] || parts[0]
   }
   const city = parts[0]
   const country = parts.slice(1).join(', ')

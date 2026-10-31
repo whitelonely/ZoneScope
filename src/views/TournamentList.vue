@@ -124,7 +124,6 @@ async function loadFilters() {
     const data = await api.filters()
     options.years = data.years
     options.regions = data.regions
-    if (!filters.year && options.years.length) filters.year = String(options.years[0])
   } catch (err) {
     /* 筛选器失败不阻断主流程 */
   }
