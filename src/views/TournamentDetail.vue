@@ -53,6 +53,14 @@
           <div class="stage-inner">
             <div v-if="group.stages.length > 1" class="stage-switch">
               <button
+                type="button"
+                class="stage-chip stage-chip--total"
+                :class="{ active: activeStage === TOTAL_STAGE }"
+                @click="selectTotal"
+              >
+                总积分
+              </button>
+              <button
                 v-for="s in group.stages"
                 :key="s.id"
                 type="button"
@@ -61,14 +69,6 @@
                 @click="selectStage(s.id)"
               >
                 {{ cnStage(s.name) }}
-              </button>
-              <button
-                type="button"
-                class="stage-chip stage-chip--total"
-                :class="{ active: activeStage === TOTAL_STAGE }"
-                @click="selectTotal"
-              >
-                总计
               </button>
             </div>
 
@@ -169,12 +169,13 @@ function mergeStages(stageList) {
   const teams = new Map()
   const matches = []
   for (const data of stageList) {
-    const prefix = data.stage && data.stage.name ? data.stage.name : ''
+    // 总计里的每局要能看出是哪一天 / 哪一组，所以带上阶段名前缀
+    const prefix = data.stage && data.stage.name ? cnStage(data.stage.name) : ''
     for (const match of data.matches || []) {
       matches.push({
         ...match,
         id: `${data.stage.id}-${match.id}`,
-        name: prefix ? `${prefix} · ${match.name}` : match.name,
+        name: prefix ? `${prefix} · ${cnMatch(match.name)}` : cnMatch(match.name),
       })
       for (const row of match.standings || []) {
         const key = row.team_name
