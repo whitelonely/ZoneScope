@@ -1,0 +1,14 @@
+# 统一用 LF 换行，避免 Windows 上反复出现
+# "LF will be replaced by CRLF the next time Git touches it" 警告。
+# 规则对整个仓库生效，换机器 / CI 行为一致。
+* text=auto eol=lf
+
+# 二进制文件不要被当文本处理
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary

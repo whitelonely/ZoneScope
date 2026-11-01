@@ -33,7 +33,7 @@
         v-for="item in list"
         :key="item.id"
         class="event-card zs-card"
-        @click="$emit('open', item.id)"
+        @click="$emit('open', item)"
       >
         <div class="event-head">
           <img

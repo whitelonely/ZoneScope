@@ -29,6 +29,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { api } from './api'
 import TournamentList from './views/TournamentList.vue'
 import TournamentDetail from './views/TournamentDetail.vue'
 
@@ -37,11 +38,27 @@ const currentId = ref('')
 // 进详情前记下列表滚到哪了，返回时原样恢复，免得重新往下翻
 const listScroll = ref(0)
 
-function openTournament(id) {
+// 地址栏用赛事名（2026-pgs-11）而不是 op.gg 的数字 id。
+// 老链接里还是数字 id，这里做一下兼容。
+async function resolveId(token) {
+  if (/^\d+$/.test(token)) return token
+  try {
+    const data = await api.tournaments({})
+    const hit = (data.results || []).find((item) => item.slug === token)
+    if (hit) return hit.id
+  } catch (err) {
+    /* 解析失败就按原样交给详情页，由它提示错误 */
+  }
+  return token
+}
+
+function openTournament(item) {
+  const id = typeof item === 'string' ? item : item.id
+  const slug = typeof item === 'string' ? item : item.slug || item.id
   listScroll.value = window.scrollY
   currentId.value = id
   view.value = 'detail'
-  history.pushState({ zone: 'detail', id }, '', `#/tournament/${id}`)
+  history.pushState({ zone: 'detail', id, slug }, '', `#/tournament/${slug}`)
   window.scrollTo({ top: 0 })
 }
 
@@ -63,11 +80,11 @@ function onPopState(event) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('popstate', onPopState)
-  const match = /#\/tournament\/(\w+)/.exec(window.location.hash)
+  const match = /#\/tournament\/([^/?#]+)/.exec(window.location.hash)
   if (match) {
-    currentId.value = match[1]
+    currentId.value = await resolveId(decodeURIComponent(match[1]))
     view.value = 'detail'
   } else {
     history.replaceState({ zone: 'list' }, '', '#/')

@@ -19,6 +19,9 @@
             {{ STATUS_TEXT[tournament.status] || tournament.status }}
           </el-tag>
         </div>
+        <p v-if="tournament.name !== shortName(tournament.name)" class="hero-full">
+          {{ tournament.name }}
+        </p>
         <div class="hero-meta">
           <span class="chip">
             <svg class="chip-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2" /><ellipse cx="8" cy="8" rx="2.6" ry="6.2" /><line x1="1.8" y1="8" x2="14.2" y2="8" /></svg>{{ cnRegion(tournament.region) }}
