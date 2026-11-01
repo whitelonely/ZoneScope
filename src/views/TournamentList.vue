@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   api,
@@ -99,6 +99,11 @@ import {
 } from '../api'
 
 defineEmits(['open'])
+
+const props = defineProps({
+  // 从详情页返回时要恢复的滚动位置
+  restoreScroll: { type: Number, default: 0 },
+})
 
 const loading = ref(false)
 const list = ref([])
@@ -132,6 +137,13 @@ async function loadFilters() {
 onMounted(async () => {
   await loadFilters()
   await load()
+  // 从详情页返回：等卡片渲染完再滚回原来的位置
+  if (props.restoreScroll > 0) {
+    await nextTick()
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: props.restoreScroll, behavior: 'auto' })
+    })
+  }
 })
 </script>
 

@@ -59,6 +59,14 @@
               >
                 {{ cnStage(s.name) }}
               </button>
+              <button
+                type="button"
+                class="stage-chip stage-chip--total"
+                :class="{ active: activeStage === TOTAL_STAGE }"
+                @click="selectTotal"
+              >
+                总计
+              </button>
             </div>
 
             <div v-loading="stageLoading">
@@ -142,6 +150,78 @@ const stageData = ref(null)
 const openMatches = ref([])
 const stageCache = ref(null)
 
+// 阶段被拆成好几天（或小组赛 A/B/C 组）时，用一个虚拟阶段把它们的对局合起来算总积分
+const TOTAL_STAGE = '__total__'
+
+async function loadStage(stageId) {
+  const key = String(stageId)
+  const cached = stageCache.value && stageCache.value[key]
+  if (cached) return cached
+  const data = await api.stage(stageId)
+  if (stageCache.value) stageCache.value[key] = data
+  return data
+}
+
+function mergeStages(stageList) {
+  const teams = new Map()
+  const matches = []
+  for (const data of stageList) {
+    const prefix = data.stage && data.stage.name ? data.stage.name : ''
+    for (const match of data.matches || []) {
+      matches.push({
+        ...match,
+        id: `${data.stage.id}-${match.id}`,
+        name: prefix ? `${prefix} · ${match.name}` : match.name,
+      })
+      for (const row of match.standings || []) {
+        const key = row.team_name
+        let cur = teams.get(key)
+        if (!cur) {
+          cur = {
+            rank: 0,
+            team_name: key,
+            team_image_url: row.team_image_url,
+            total_score: 0,
+            place_score: 0,
+            kills: 0,
+            wwcd: 0,
+          }
+          teams.set(key, cur)
+        }
+        cur.total_score += row.total_score || 0
+        cur.place_score += row.place_score || 0
+        cur.kills += row.kills || 0
+        cur.wwcd += row.wwcd || 0
+        if (!cur.team_image_url && row.team_image_url) cur.team_image_url = row.team_image_url
+      }
+    }
+  }
+  const standings = [...teams.values()].sort(
+    (a, b) => b.total_score - a.total_score || b.wwcd - a.wwcd || b.kills - a.kills,
+  )
+  standings.forEach((row, index) => {
+    row.rank = index + 1
+  })
+  return { standings, matches }
+}
+
+async function selectTotal() {
+  const group = groups.value.find((g) => String(g.id) === activeGroup.value)
+  if (!group || group.stages.length < 2) return
+  activeStage.value = TOTAL_STAGE
+  stageLoading.value = true
+  openMatches.value = []
+  try {
+    const list = await Promise.all(group.stages.map((s) => loadStage(s.id)))
+    stageData.value = mergeStages(list)
+  } catch (err) {
+    ElMessage.error(err.message)
+    stageData.value = null
+  } finally {
+    stageLoading.value = false
+  }
+}
+
 async function selectStage(stageId) {
   const group = groups.value.find((g) => String(g.id) === activeGroup.value)
   const stage = group && group.stages.find((s) => String(s.id) === String(stageId))
@@ -160,10 +240,9 @@ async function selectStage(stageId) {
 
   stageLoading.value = true
   try {
-    stageData.value = await api.stage(stage.id)
-    openMatches.value = stageData.value.matches.length
-      ? [String(stageData.value.matches[0].id)]
-      : []
+    const data = await loadStage(stage.id)
+    stageData.value = data
+    openMatches.value = data.matches.length ? [String(data.matches[0].id)] : []
   } catch (err) {
     ElMessage.error(err.message)
     stageData.value = null
@@ -346,6 +425,16 @@ watch(() => props.tournamentId, load)
   border-color: var(--zs-primary);
   color: #fff;
   font-weight: 600;
+}
+
+.stage-chip--total {
+  margin-left: 4px;
+  border-style: dashed;
+  font-weight: 600;
+}
+
+.stage-chip--total.active {
+  border-style: solid;
 }
 
 .table-wrap {

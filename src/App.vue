@@ -11,7 +11,11 @@
     </header>
 
     <main class="app-main">
-      <TournamentList v-if="view === 'list'" @open="openTournament" />
+      <TournamentList
+        v-if="view === 'list'"
+        :restore-scroll="listScroll"
+        @open="openTournament"
+      />
       <TournamentDetail
         v-else
         :tournament-id="currentId"
@@ -30,8 +34,11 @@ import TournamentDetail from './views/TournamentDetail.vue'
 
 const view = ref('list')
 const currentId = ref('')
+// 进详情前记下列表滚到哪了，返回时原样恢复，免得重新往下翻
+const listScroll = ref(0)
 
 function openTournament(id) {
+  listScroll.value = window.scrollY
   currentId.value = id
   view.value = 'detail'
   history.pushState({ zone: 'detail', id }, '', `#/tournament/${id}`)
@@ -42,7 +49,7 @@ function goList(push = true) {
   view.value = 'list'
   currentId.value = ''
   if (push) history.pushState({ zone: 'list' }, '', '#/')
-  window.scrollTo({ top: 0 })
+  // 滚动位置交给 TournamentList，在列表数据渲染完之后恢复
 }
 
 function onPopState(event) {
@@ -51,6 +58,7 @@ function onPopState(event) {
     currentId.value = state.id
     view.value = 'detail'
   } else {
+    // 浏览器后退回到列表：同样恢复离开时的滚动位置
     goList(false)
   }
 }
