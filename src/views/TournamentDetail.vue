@@ -238,7 +238,8 @@ async function selectStage(stageId) {
   const cached = stageCache.value && stageCache.value[String(stage.id)]
   if (cached) {
     stageData.value = cached
-    openMatches.value = cached.matches.length ? [String(cached.matches[0].id)] : []
+    // 各局比赛默认收起，想看再点开
+    openMatches.value = []
     return
   }
 
@@ -246,7 +247,7 @@ async function selectStage(stageId) {
   try {
     const data = await loadStage(stage.id)
     stageData.value = data
-    openMatches.value = data.matches.length ? [String(data.matches[0].id)] : []
+    openMatches.value = []
   } catch (err) {
     ElMessage.error(err.message)
     stageData.value = null
