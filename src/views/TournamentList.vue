@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, nextTick } from 'vue'
+import { reactive, ref, onMounted, nextTick, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   api,
@@ -109,7 +109,30 @@ const loading = ref(false)
 const list = ref([])
 const count = ref(0)
 const options = reactive({ years: [], regions: [] })
-const filters = reactive({ year: '', region: '', status: '', q: '' })
+
+// 筛选条件记到 sessionStorage：点进赛事再返回时，筛选结果还在，
+// 不用重新选一遍（和滚动位置恢复是配套的）
+const FILTER_KEY = 'zs-filters'
+function readFilters() {
+  try {
+    return JSON.parse(sessionStorage.getItem(FILTER_KEY) || '{}')
+  } catch (err) {
+    return {}
+  }
+}
+const filters = reactive({ year: '', region: '', status: '', q: '', ...readFilters() })
+
+watch(
+  filters,
+  (value) => {
+    try {
+      sessionStorage.setItem(FILTER_KEY, JSON.stringify(value))
+    } catch (err) {
+      /* 隐私模式下 sessionStorage 可能不可用，忽略 */
+    }
+  },
+  { deep: true },
+)
 
 async function load() {
   loading.value = true

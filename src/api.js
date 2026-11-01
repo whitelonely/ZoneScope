@@ -116,6 +116,7 @@ const SERIES_ABBR = [
   [/\bSpring\b/gi, '春季赛'],
   [/\bSummer\b/gi, '夏季赛'],
   [/\bFall\b/gi, '秋季赛'],
+  [/\bAutumn\b/gi, '秋季赛'],
   [/\bWinter\b/gi, '冬季赛'],
 ]
 
@@ -124,7 +125,10 @@ export function shortName(name) {
   SERIES_ABBR.forEach(([re, abbr]) => {
     s = s.replace(re, abbr)
   })
-  return s.replace(/\s+/g, ' ').trim()
+  s = s.replace(/\s+/g, ' ').trim()
+  // 年份提到最前面，跟其它赛事统一：PCL 2026 秋季赛 -> 2026 PCL 秋季赛
+  s = s.replace(/^PCL\s+(20\d{2})\s*(.*)$/, '$1 PCL $2').trim()
+  return s
 }
 
 const REGION_CN = {
